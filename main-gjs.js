@@ -44,13 +44,13 @@ IBus.init();
 var bus = new IBus.Bus();
 
 if (bus.is_connected()) {
-    
+
     /* =========================================================================== */
     /* =========================================================================== */
     /*                           IBus Engine                                       */
     /* =========================================================================== */
     /* =========================================================================== */
-    
+
     var id = 0;
 
     function _create_engine_cb(factory, engine_name) {
@@ -63,22 +63,22 @@ if (bus.is_connected()) {
         });
         print("Created Engine #" + id);
 
-        engine.connect('process-key-event', engine_process_key_event );
+        engine.connect('process-key-event', engine_process_key_event);
 
-        engine.connect('candidate-clicked', engine_candidate_clicked );
-        
-        engine.connect('focus-out', engine_focus_out );
+        engine.connect('candidate-clicked', engine_candidate_clicked);
 
-        engine.connect('focus-in', engine_focus_in );
+        engine.connect('focus-out', engine_focus_out);
 
-        engine.connect('property-activate', engine_property_activate );
+        engine.connect('focus-in', engine_focus_in);
 
-        engine.lookuptable = IBus.LookupTable.new(16, 0, true, true);        
+        engine.connect('property-activate', engine_property_activate);
+
+        engine.lookuptable = IBus.LookupTable.new(16, 0, true, true);
         resetAll(engine);
         initSetting(engine);
         return engine;
     }
-    
+
     function engine_process_key_event(engine, keyval, keycode, state) {
 
         //print keypress infos, helpful for debugging
@@ -106,14 +106,14 @@ if (bus.is_connected()) {
              keyval == IBus.KP_Multiply ||
              keyval == IBus.KP_Divide ||
              keyval == IBus.KP_Subtract) {
-            
+
             engine.buffertext += IBus.keyval_to_unicode(keyval);
             updateCurrentSuggestions(engine);
             return true;
-            
+
         } else if (keyval == IBus.Return || keyval == IBus.space || keyval == IBus.Tab) {
-            if (engine.buffertext.length > 0){
-                if ((keyval == IBus.Return) && engine.setting_switch_newline && engine.setting_switch_preview && (engine.buffertext.length > 0)){
+            if (engine.buffertext.length > 0) {
+                if ((keyval == IBus.Return) && engine.setting_switch_newline && engine.setting_switch_preview && (engine.buffertext.length > 0)) {
                     commitCandidate(engine);
                     return true;
                 } else {
@@ -125,14 +125,14 @@ if (bus.is_connected()) {
             if (engine.buffertext.length > 0) {
                 engine.buffertext = engine.buffertext.substr(0, engine.buffertext.length - 1);
                 updateCurrentSuggestions(engine);
-                
+
                 if (engine.buffertext.length <= 0) {
-                    resetAll(engine);                  
+                    resetAll(engine);
                 }
                 return true;
-            } 
+            }
         } else if (keyval == IBus.Left || keyval == IBus.KP_Left || keyval == IBus.Right || keyval == IBus.KP_Right) {
-            if (engine.currentSuggestions.length <= 0 || engine.lookuptable.get_orientation() == 1){                    
+            if (engine.currentSuggestions.length <= 0 || engine.lookuptable.get_orientation() == 1) {
                 commitCandidate(engine);
             } else {
                 if (keyval == IBus.Left || keyval == IBus.KP_Left) {
@@ -141,13 +141,13 @@ if (bus.is_connected()) {
                 else if (keyval == IBus.Right || keyval == IBus.KP_Right) {
                     incSelection(engine);
                 }
-                
+
                 return true;
             }
-            
+
         } else if (keyval == IBus.Up || keyval == IBus.KP_Up || keyval == IBus.Down || keyval == IBus.KP_Down) {
-            print (engine.lookuptable.get_orientation());
-            if (engine.currentSuggestions.length <= 0 || engine.lookuptable.get_orientation() == 0){                    
+            print(engine.lookuptable.get_orientation());
+            if (engine.currentSuggestions.length <= 0 || engine.lookuptable.get_orientation() == 0) {
                 commitCandidate(engine);
             } else {
                 if (keyval == IBus.Up) {
@@ -156,39 +156,39 @@ if (bus.is_connected()) {
                 else if (keyval == IBus.Down) {
                     incSelection(engine);
                 }
-                
+
                 return true;
             }
-       
-        } else if (keyval == IBus.Control_L || 
-                   keyval == IBus.Control_R || 
-                   keyval == IBus.Insert || 
-                   keyval == IBus.KP_Insert || 
-                   keyval == IBus.Delete || 
-                   keyval == IBus.KP_Delete || 
-                   keyval == IBus.Home || 
-                   keyval == IBus.KP_Home || 
-                   keyval == IBus.Page_Up || 
-                   keyval == IBus.KP_Page_Up || 
-                   keyval == IBus.Page_Down || 
-                   keyval == IBus.KP_Page_Down || 
-                   keyval == IBus.End || 
-                   keyval == IBus.KP_End || 
-                   keyval == IBus.Alt_L || 
-                   keyval == IBus.Alt_R || 
-                   keyval == IBus.Super_L || 
-                   keyval == IBus.Super_R || 
-                   keyval == IBus.Return || 
-                   keyval == IBus.space || 
-                   keyval == IBus.Tab || 
-                   keyval == IBus.KP_Enter) {
-                
-                commitCandidate(engine);
+
+        } else if (keyval == IBus.Control_L ||
+            keyval == IBus.Control_R ||
+            keyval == IBus.Insert ||
+            keyval == IBus.KP_Insert ||
+            keyval == IBus.Delete ||
+            keyval == IBus.KP_Delete ||
+            keyval == IBus.Home ||
+            keyval == IBus.KP_Home ||
+            keyval == IBus.Page_Up ||
+            keyval == IBus.KP_Page_Up ||
+            keyval == IBus.Page_Down ||
+            keyval == IBus.KP_Page_Down ||
+            keyval == IBus.End ||
+            keyval == IBus.KP_End ||
+            keyval == IBus.Alt_L ||
+            keyval == IBus.Alt_R ||
+            keyval == IBus.Super_L ||
+            keyval == IBus.Super_R ||
+            keyval == IBus.Return ||
+            keyval == IBus.space ||
+            keyval == IBus.Tab ||
+            keyval == IBus.KP_Enter) {
+
+            commitCandidate(engine);
         }
         return false;
     }
 
-    function engine_candidate_clicked(engine,index,button,state) {
+    function engine_candidate_clicked(engine, index, button, state) {
         if (engine.buffertext.length > 0) {
             engine.currentSelection = index;
             preeditCandidate(engine);
@@ -218,11 +218,11 @@ if (bus.is_connected()) {
 
     proplist.append(propp);
 
-    function engine_focus_in(engine) {    
+    function engine_focus_in(engine) {
         engine.register_properties(proplist);
     }
 
-    function engine_property_activate(engine) {    
+    function engine_property_activate(engine) {
         runPreferences();
     }
 
@@ -231,132 +231,132 @@ if (bus.is_connected()) {
     /*                  Engine Utility Functions                                   */
     /* =========================================================================== */
     /* =========================================================================== */
-    
+
     var suggestionBuilder = new suggestion.SuggestionBuilder();
-    
-    function initSetting(engine){
+
+    function initSetting(engine) {
         engine.setting = Gio.Settings.new("com.omicronlab.avro");
-    
+
         //set up a asynchronous callback for instant change later
-        engine.setting.connect('changed', 
-            function(){
+        engine.setting.connect('changed',
+            function () {
                 readSetting(engine);
-        });
-    
+            });
+
         //read manually first time
         readSetting(engine);
     }
-    
-    
-    function readSetting(engine){
+
+
+    function readSetting(engine) {
         engine.setting_switch_preview = engine.setting.get_boolean('switch-preview');
         engine.setting_switch_dict = engine.setting.get_boolean('switch-dict');
         engine.setting_switch_newline = engine.setting.get_boolean('switch-newline');
         engine.lookuptable.set_orientation(engine.setting.get_int('cboxorient'));
         engine.setting_lutable_size = engine.setting.get_int('lutable-size');
         engine.lookuptable.set_page_size(engine.setting_lutable_size);
-        
-        if (!engine.setting_switch_preview){
+
+        if (!engine.setting_switch_preview) {
             engine.setting_switch_dict = false;
             engine.setting_switch_newline = false;
         }
-        
-        var dictPref =  suggestionBuilder.getPref();
+
+        var dictPref = suggestionBuilder.getPref();
         dictPref.dictEnable = engine.setting_switch_dict;
         suggestionBuilder.setPref(dictPref);
     }
-    
-    
-    function resetAll(engine){
+
+
+    function resetAll(engine) {
         engine.currentSuggestions = [];
         engine.currentSelection = 0;
-        
+
         engine.buffertext = "";
         engine.lookuptable.clear();
         engine.hide_preedit_text();
         engine.hide_auxiliary_text();
         engine.hide_lookup_table();
     }
-    
-    
-    function updateCurrentSuggestions(engine){
+
+
+    function updateCurrentSuggestions(engine) {
         var suggestion = suggestionBuilder.suggest(engine.buffertext);
         engine.currentSuggestions = suggestion['words'].slice(0, engine.setting_lutable_size);
         engine.currentSelection = suggestion['prevSelection'];
-        
-        fillLookupTable (engine);
+
+        fillLookupTable(engine);
     }
-    
-    
-    function fillLookupTable (engine){
-        
-        if (engine.setting_switch_preview){
+
+
+    function fillLookupTable(engine) {
+
+        if (engine.setting_switch_preview) {
             var auxiliaryText = IBus.Text.new_from_string(engine.buffertext);
             engine.update_auxiliary_text(auxiliaryText, true);
-            
-            if (engine.setting_switch_dict){
+
+            if (engine.setting_switch_dict) {
                 engine.lookuptable.clear();
 
-                engine.currentSuggestions.forEach(function(word){
+                engine.currentSuggestions.forEach(function (word) {
                     let wtext = IBus.Text.new_from_string(word);
                     //default, ibus sets "1,2,3,4...." as label, i didn't find how to hide it,but a empty string can partially hide it
                     let wlabel = IBus.Text.new_from_string('');;
                     engine.lookuptable.append_candidate(wtext);
                     engine.lookuptable.append_label(wlabel);
-                });   
+                });
             }
         }
-        
+
         preeditCandidate(engine);
     }
-    
-    
-    function preeditCandidate(engine){
-        if (engine.setting_switch_preview){
-            if (engine.setting_switch_dict){
+
+
+    function preeditCandidate(engine) {
+        if (engine.setting_switch_preview) {
+            if (engine.setting_switch_dict) {
                 engine.lookuptable.set_cursor_pos(engine.currentSelection);
-                engine.update_lookup_table_fast(engine.lookuptable,true);
+                engine.update_lookup_table_fast(engine.lookuptable, true);
             }
         }
-        
+
         var preeditText = IBus.Text.new_from_string(engine.currentSuggestions[engine.currentSelection]);
         engine.update_preedit_text(preeditText, engine.currentSuggestions[engine.currentSelection].length, true);
     }
-    
-    function commitCandidate(engine){
-        if (engine.buffertext.length > 0){
+
+    function commitCandidate(engine) {
+        if (engine.buffertext.length > 0) {
             var commitText = IBus.Text.new_from_string(engine.currentSuggestions[engine.currentSelection]);
             engine.commit_text(commitText);
         }
-        
+
         suggestionBuilder.stringCommitted(engine.buffertext, engine.currentSuggestions[engine.currentSelection]);
-        
+
         resetAll(engine);
     }
-    
-    function incSelection(engine){
+
+    function incSelection(engine) {
         var lastIndex = engine.currentSuggestions.length - 1;
-        
-        if ((engine.currentSelection + 1) > lastIndex){
+
+        if ((engine.currentSelection + 1) > lastIndex) {
             engine.currentSelection = -1;
-        } 
+        }
         ++engine.currentSelection;
         preeditCandidate(engine);
-        
+
         suggestionBuilder.updateCandidateSelection(engine.buffertext, engine.currentSuggestions[engine.currentSelection]);
     }
-    
-    function decSelection(engine){
-        if ((engine.currentSelection - 1) < 0){
+
+    function decSelection(engine) {
+        if ((engine.currentSelection - 1) < 0) {
             engine.currentSelection = engine.currentSuggestions.length;
         }
         --engine.currentSelection;
         preeditCandidate(engine);
-        
+
         suggestionBuilder.updateCandidateSelection(engine.buffertext, engine.currentSuggestions[engine.currentSelection]);
     }
-    
-    function runPreferences(){
+
+    function runPreferences() {
         //code for running preferences windows will be here
         prefwindow.runpref();
     }
@@ -370,8 +370,8 @@ if (bus.is_connected()) {
     factory.connect('create-engine', _create_engine_cb);
 
     // property 'exec' is changed to 'command-line' in recent ibus,the try-catch block is here for supporting both.
-    var component = null;   
-    try {      
+    var component = null;
+    try {
         component = new IBus.Component({
             name: "org.freedesktop.IBus.Avro",
             description: "Avro Phonetic",
@@ -394,7 +394,7 @@ if (bus.is_connected()) {
             textdomain: "avro-phonetic"
         });
     }
-    
+
     //opensuse's ibus supports only Property(Menu) but ubuntu only supports "setup" param for Preferences Button, try-catch in rescue
     try {
         var avroenginedesc = new IBus.EngineDesc({
@@ -419,11 +419,11 @@ if (bus.is_connected()) {
             icon: eevars.get_pkgdatadir() + "/avro-bangla.png",
             layout: "bn"
         });
-    
+
     }
 
     component.add_engine(avroenginedesc);
-    
+
     if (exec_by_ibus) {
         bus.request_name("org.freedesktop.IBus.Avro", 0);
     } else {
