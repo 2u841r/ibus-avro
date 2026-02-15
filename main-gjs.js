@@ -103,12 +103,35 @@ if (bus.is_connected()) {
         // process letter key events
         if ((keyval >= 33 && keyval <= 126) ||
             (keyval >= IBus.KP_0 && keyval <= IBus.KP_9) ||
-             keyval == IBus.KP_Add ||
-             keyval == IBus.KP_Decimal ||
-             keyval == IBus.KP_Divide ||
-             keyval == IBus.KP_Multiply ||
-             keyval == IBus.KP_Divide ||
-             keyval == IBus.KP_Subtract) {
+            keyval == IBus.KP_Add ||
+            keyval == IBus.KP_Decimal ||
+            keyval == IBus.KP_Divide ||
+            keyval == IBus.KP_Multiply ||
+            keyval == IBus.KP_Divide ||
+            keyval == IBus.KP_Subtract) {
+
+            // Check if this is a special character not used in Avro transliteration
+            var ch = String.fromCharCode(keyval);
+            var isAvroChar = /[a-zA-Z0-9`~:^,$.\\]/.test(ch);
+
+            if (!isAvroChar) {
+                if (engine.buffertext.length > 0) {
+                    // Commit Bangla text and special char together as one string
+                    // to avoid double commit_text race on some IBus versions
+                    var banglaText = engine.currentSuggestions[engine.currentSelection];
+                    var commitText = IBus.Text.new_from_string(banglaText + ch);
+                    engine.commit_text(commitText);
+                    suggestionBuilder.stringCommitted(engine.buffertext, banglaText);
+                    resetAll(engine);
+                    return true;
+                }
+                // Buffer is empty, commit the special char directly rather than
+                // returning false, because some IBus versions (Ubuntu 24) lose the
+                // Shift modifier on re-processing (e.g. Shift+5 produces '5' not '%')
+                var commitText = IBus.Text.new_from_string(ch);
+                engine.commit_text(commitText);
+                return true;
+            }
 
             engine.buffertext += IBus.keyval_to_unicode(keyval);
             updateCurrentSuggestions(engine);
