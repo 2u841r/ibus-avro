@@ -87,6 +87,9 @@ if (bus.is_connected()) {
         //sanitize state, main reason is to weed out xorg masks
         state = state & IBus.ModifierType.MODIFIER_MASK;
 
+        //ignore Caps Lock state - Avro should work the same regardless
+        state = state & ~IBus.ModifierType.LOCK_MASK;
+
         //ignore release event
         if (!(state == 0 || state == 1 || state == 16 || state == 17)) {
             return false;
