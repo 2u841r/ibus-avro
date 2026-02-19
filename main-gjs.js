@@ -111,7 +111,7 @@ if (bus.is_connected()) {
             keyval == IBus.KP_Subtract) {
 
             // Check if this is a special character not used in Avro transliteration
-            var ch = String.fromCharCode(keyval);
+            var ch = IBus.keyval_to_unicode(keyval);
             var isAvroChar = /[a-zA-Z0-9`~:^,$.\\]/.test(ch);
 
             if (!isAvroChar) {
