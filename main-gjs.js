@@ -71,6 +71,10 @@ if (bus.is_connected()) {
 
         engine.connect('focus-in', engine_focus_in);
 
+        engine.connect('reset', engine_reset);
+
+        engine.connect('disable', engine_disable);
+
         engine.connect('property-activate', engine_property_activate);
 
         engine.lookuptable = IBus.LookupTable.new(16, 0, true, true);
@@ -188,6 +192,8 @@ if (bus.is_connected()) {
 
         } else if (keyval == IBus.Control_L ||
             keyval == IBus.Control_R ||
+            keyval == IBus.Escape ||
+            (keyval >= IBus.F1 && keyval <= IBus.F12) ||
             keyval == IBus.Insert ||
             keyval == IBus.KP_Insert ||
             keyval == IBus.Delete ||
@@ -224,6 +230,16 @@ if (bus.is_connected()) {
     }
 
     function engine_focus_out(engine) {
+        if (engine.buffertext.length > 0) {
+            commitCandidate(engine);
+        }
+    }
+
+    function engine_reset(engine) {
+        resetAll(engine);
+    }
+
+    function engine_disable(engine) {
         if (engine.buffertext.length > 0) {
             commitCandidate(engine);
         }
